@@ -1,14 +1,17 @@
 {
   "name": "voxly-frontend",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 3002",
+    "dev": "next dev --turbopack -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
-    "lint:fix": "next lint --fix"
+    "lint:fix": "next lint --fix",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run lint && npm run build",
+    "prepare": "husky"
   },
   "overrides": {
     "react-is": "^19.0.0-rc-69d4b800-20241021"
@@ -45,6 +48,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tailwindcss": "^3.18.0",
+    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.4",
