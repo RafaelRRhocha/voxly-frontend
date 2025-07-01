@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+  images: {
+    domains: ['user-images.githubusercontent.com', 'cdn.discordapp.com'],
+  },
 };
 
 export default nextConfig;
