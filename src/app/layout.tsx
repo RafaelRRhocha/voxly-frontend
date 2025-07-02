@@ -4,6 +4,8 @@ import { Inter } from "next/font/google";
 import Sidebar from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 
+import Header from "./header";
+
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +33,13 @@ export default function RootLayout({
         )}
       >
         <Sidebar />
-        {children}
+        <Header
+          entityName="Voxly"
+          userName="John Doe"
+          userEmail="john.doe@example.com"
+        />
+
+        <main className="flex-1 pt-20 p-6 overflow-y-auto">{children}</main>
       </body>
     </html>
   );

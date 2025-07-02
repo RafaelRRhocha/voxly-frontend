@@ -38,7 +38,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="sm:ml-14 p-4">
+    <section className="sm:ml-14 p-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (
           <Card key={card.title + card.description}>
@@ -65,6 +65,6 @@ export default function Home() {
       <div className="mt-4 flex flex-col md:flex-row gap-4">
         <ChartOverview />
       </div>
-    </main>
+    </section>
   );
 }

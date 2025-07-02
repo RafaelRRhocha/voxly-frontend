@@ -1,0 +1,36 @@
+{
+  "prettier.jsxSingleQuote": true,
+  "prettier.singleQuote": true,
+  "editor.fontSize": 15,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 120,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "eslint.format.enable": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "workbench.preferredHighContrastLightColorTheme": "Default Dark+",
+  "workbench.preferredLightColorTheme": "Default Dark+",
+  "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+  "git.confirmSync": false,
+  "git.autorefresh": true,
+  "git.autofetch": false,
+  "git.closeDiffOnOperation": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "debug.javascript.autoAttachFilter": "disabled"
+}
