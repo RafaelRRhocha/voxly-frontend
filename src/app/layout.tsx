@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import Sidebar from "@/components/sidebar";
+import ConditionalLayout from "@/components/conditional-layout";
 import { cn } from "@/lib/utils";
-
-import Header from "./header";
 
 import "./globals.css";
 
@@ -32,14 +30,7 @@ export default function RootLayout({
           inter.className,
         )}
       >
-        <Sidebar />
-        <Header
-          entityName="Voxly"
-          userName="John Doe"
-          userEmail="john.doe@example.com"
-        />
-
-        <main className="flex-1 pt-20 p-6 overflow-y-auto">{children}</main>
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

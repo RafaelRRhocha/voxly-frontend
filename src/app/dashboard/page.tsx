@@ -1,3 +1,5 @@
+"use client";
+
 import { DollarSign, Package, ShoppingCart, Users2 } from "lucide-react";
 
 import ChartOverview from "@/components/chart";
@@ -8,37 +10,47 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useDashboard } from "@/hooks";
 
-export default function Home() {
+export default function DashboardPage() {
+  const { metrics } = useDashboard();
+
   const cards = [
     {
       title: "Total de vendas",
       description: "Total de vendas do mês",
       icon: DollarSign,
-      content: "R$ 100.000,00",
+      content: metrics
+        ? `R$ ${metrics.totalSales.toLocaleString("pt-BR")}`
+        : "R$ 100.000,00",
     },
     {
       title: "Total de clientes",
       description: "Total de clientes do mês",
       icon: Users2,
-      content: "100",
+      content: metrics ? metrics.totalCustomers.toString() : "100",
     },
     {
       title: "Total de pedidos",
       description: "Total de pedidos do mês",
       icon: ShoppingCart,
-      content: "100",
+      content: metrics ? metrics.totalOrders.toString() : "100",
     },
     {
       title: "Total de produtos",
       description: "Total de produtos cadastrados",
       icon: Package,
-      content: "100",
+      content: metrics ? metrics.totalProducts.toString() : "100",
     },
   ];
 
   return (
     <section className="sm:ml-14 p-4">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600">Visão geral das suas métricas</p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (
           <Card key={card.title + card.description}>

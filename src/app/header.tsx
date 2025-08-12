@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -12,35 +11,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks";
 
 interface HeaderProps {
   entityName: string;
-  userName: string;
-  userEmail: string;
-  onLogout?: () => void;
 }
 
-export default function Header({
-  entityName,
-  userName,
-  userEmail,
-  onLogout,
-}: HeaderProps) {
-  const router = useRouter();
-  const initials = userName
+export default function Header({ entityName }: HeaderProps) {
+  const { user, logoutAndRedirect } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  const initials = user.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase();
 
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      // fallback: clear token and redirect
-      localStorage.removeItem("access_token");
-      router.push("/login");
-    }
+    logoutAndRedirect("/login");
   };
 
   return (
@@ -54,8 +45,8 @@ export default function Header({
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="text-sm text-left">
-              <div className="font-medium">{userName}</div>
-              <div className="text-muted-foreground text-xs">{userEmail}</div>
+              <div className="font-medium">{user.name}</div>
+              <div className="text-muted-foreground text-xs">{user.email}</div>
             </div>
           </div>
         </DropdownMenuTrigger>

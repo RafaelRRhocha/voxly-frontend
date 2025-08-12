@@ -3,6 +3,8 @@
 import { DollarSign } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
+import { useDashboard } from "@/hooks";
+
 import {
   Card,
   CardContent,
@@ -13,7 +15,9 @@ import {
 import { ChartConfig, ChartContainer } from "../ui/chart";
 
 const ChartOverview = () => {
-  const chartData = [
+  const { chartData, isLoadingChartData } = useDashboard();
+
+  const fallbackData = [
     { month: "January", desktop: 186, mobile: 80 },
     { month: "February", desktop: 305, mobile: 200 },
     { month: "March", desktop: 237, mobile: 120 },
@@ -21,6 +25,8 @@ const ChartOverview = () => {
     { month: "May", desktop: 209, mobile: 130 },
     { month: "June", desktop: 214, mobile: 140 },
   ];
+
+  const displayData = chartData.length > 0 ? chartData : fallbackData;
 
   const chartConfig = {
     desktop: {
@@ -38,17 +44,21 @@ const ChartOverview = () => {
       <CardHeader>
         <div className="flex items-center justify-center select-none">
           <CardTitle className="text-lg sm:text-xl text-gray-800">
-            teste
+            Vendas por Período
           </CardTitle>
           <DollarSign className="ml-auto size-4" />
         </div>
 
-        <CardDescription>teste description</CardDescription>
+        <CardDescription>
+          {isLoadingChartData
+            ? "Carregando dados..."
+            : "Comparativo de vendas desktop vs mobile"}
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart data={chartData}>
+          <BarChart data={displayData}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"

@@ -31,7 +31,7 @@ export default function NotFound() {
         </CardContent>
         <CardFooter>
           <Button asChild className="w-full">
-            <Link href="/">
+            <Link href="/dashboard">
               <Home className="mr-2 size-4" />
               Voltar para a página inicial
             </Link>

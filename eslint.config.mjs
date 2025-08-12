@@ -17,6 +17,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  ...compat.extends("next/core-web-vitals"),
   {
     files: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
     languageOptions: {
@@ -86,7 +87,6 @@ const eslintConfig = [
       },
     },
   },
-  ...compat.extends("next/core-web-vitals"),
 ];
 
 export default eslintConfig;
