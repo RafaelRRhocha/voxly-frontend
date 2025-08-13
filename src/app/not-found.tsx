@@ -10,17 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { isMobile } from "@/lib/utils";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex items-center justify-center size-full min-h-screen overflow-hidden">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">
             <FileQuestion className="size-5 text-muted-foreground" />
-            <CardTitle className="text-xl">Página não encontrada</CardTitle>
+            <CardTitle className="text-lg md:text-xl whitespace-nowrap">
+              Página não encontrada
+            </CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-sm md:text-base">
             A página que você está procurando não existe ou foi removida.
           </CardDescription>
         </CardHeader>
@@ -32,7 +35,7 @@ export default function NotFound() {
         <CardFooter>
           <Button asChild className="w-full">
             <Link href="/dashboard">
-              <Home className="mr-2 size-4" />
+              {isMobile() && <Home className="mr-2 size-4" />}
               Voltar para a página inicial
             </Link>
           </Button>

@@ -1,15 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
   Home,
   LogOut,
   Package,
-  Settings2,
-  ShoppingBag,
-  Users2,
+  Store,
+  Users,
+  Vote,
   X,
 } from "lucide-react";
 
@@ -39,19 +38,19 @@ export default function Sidebar() {
       href: "/dashboard",
     },
     {
-      icon: ShoppingBag,
-      label: "Pedidos",
-      href: "/shopping",
+      icon: Vote,
+      label: "Enquetes",
+      href: "/surveys",
     },
     {
-      icon: Users2,
-      label: "Clientes",
-      href: "/users",
+      icon: Store,
+      label: "Lojas",
+      href: "/stores",
     },
     {
-      icon: Settings2,
-      label: "Configurações",
-      href: "/settings",
+      icon: Users,
+      label: "Vendedores",
+      href: "/sellers",
     },
   ];
 
@@ -74,8 +73,8 @@ export default function Sidebar() {
     .join("")
     .toUpperCase();
 
-  const handleLogout = () => {
-    logoutAndRedirect("/login");
+  const handleLogout = async () => {
+    await logoutAndRedirect("/login");
   };
 
   if (isCollapsed && !isOpen) {
@@ -110,7 +109,7 @@ export default function Sidebar() {
                     className={cn(
                       "w-8 h-8",
                       isLinkActive(link.href)
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted",
                     )}
                   >
@@ -176,7 +175,7 @@ export default function Sidebar() {
               className={cn(
                 "justify-start gap-3 px-3 py-2 h-auto text-sm font-medium",
                 isLinkActive(link.href)
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted",
               )}
             >

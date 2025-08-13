@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/stores";
@@ -6,9 +6,13 @@ import { useAuthStore } from "@/stores";
 export const useAuth = () => {
   const authStore = useAuthStore();
   const router = useRouter();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    authStore.initializeAuth();
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      authStore.initializeAuth();
+    }
   }, []);
 
   const loginAndRedirect = async (
@@ -20,13 +24,16 @@ export const useAuth = () => {
     router.push(redirectTo);
   };
 
-  const logoutAndRedirect = (redirectTo: string = "/login") => {
-    authStore.logout();
+  const logoutAndRedirect = async (redirectTo: string = "/login") => {
+    await authStore.logout();
     router.push(redirectTo);
   };
 
+  const isAuthenticated = !!authStore.user && !!authStore.email;
+
   return {
     ...authStore,
+    isAuthenticated,
     loginAndRedirect,
     logoutAndRedirect,
   };

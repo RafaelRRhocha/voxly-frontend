@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import NotFound from "@/app/not-found";
 import { useAuth } from "@/hooks";
 
 import Loading from "../ui/loading";
@@ -17,21 +16,21 @@ export function ProtectedRoute({
   children,
   redirectTo = "/login",
 }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (isInitialized && !isLoading && !user) {
       router.push(redirectTo);
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, isInitialized]);
 
-  if (isLoading) {
+  if (isLoading || !isInitialized) {
     return <Loading />;
   }
 
   if (!user) {
-    return <NotFound />;
+    return null;
   }
 
   return <>{children}</>;

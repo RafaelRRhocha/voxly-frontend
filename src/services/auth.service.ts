@@ -1,37 +1,85 @@
 import { AuthResponse, LoginCredentials, User } from "@/types";
+import { CryptoUtils } from "@/utils/crypto";
+import { StorageManager } from "@/utils/storage";
 
 import { api } from "./api";
 
 export class AuthService {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // return api.postWithoutAuth<AuthResponse>("/auth/login", credentials);
+  private getStoredToken(): string | null {
+    const encryptedToken = StorageManager.get("auth-token");
+    if (!encryptedToken) return null;
+    return CryptoUtils.decrypt(encryptedToken);
+  }
 
-    return {
+  private saveToken(token: string): void {
+    const encryptedToken = CryptoUtils.encrypt(token);
+    StorageManager.set("auth-token", encryptedToken);
+  }
+
+  getStoredEmail(): string | null {
+    return StorageManager.get("auth-email");
+  }
+
+  saveAuth(email: string, token: string): void {
+    if (email) {
+      StorageManager.set("auth-email", email);
+      this.saveToken(token);
+    }
+  }
+
+  clearAuth(): void {
+    StorageManager.clear();
+  }
+
+  hasAuth(): boolean {
+    return StorageManager.hasAuth();
+  }
+
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    // const response = await api.postWithoutAuth<AuthResponse>(
+    //   "/auth/login",
+    //   credentials,
+    // );
+
+    const response = {
       user: {
         id: "1",
-        email: "teste@teste.com",
+        email: credentials.email,
         name: "Teste",
       },
       token: "123",
     };
+    this.saveAuth(credentials.email, response.token);
+    return response;
   }
 
   async register(
     userData: LoginCredentials & { name: string },
   ): Promise<AuthResponse> {
-    return api.postWithoutAuth<AuthResponse>("/auth/register", userData);
+    const response = await api.postWithoutAuth<AuthResponse>(
+      "/auth/register",
+      userData,
+    );
+    this.saveAuth(userData.email, response.token);
+    return response;
   }
 
   async getProfile(): Promise<User> {
-    return api.get<User>("/auth/profile");
+    // return api.get<User>("/auth/profile");
+
+    return {
+      id: "1",
+      email: "teste@teste.com",
+      name: "Teste",
+    };
   }
 
-  async refreshToken(): Promise<AuthResponse> {
-    return api.post<AuthResponse>("/auth/refresh");
-  }
-
-  async logout(): Promise<void> {
-    return api.post<void>("/auth/logout");
+  async refreshToken(email: string): Promise<AuthResponse> {
+    const response = await api.postWithoutAuth<AuthResponse>("/auth/refresh", {
+      email,
+    });
+    this.saveToken(response.token);
+    return response;
   }
 
   async forgotPassword(email: string): Promise<void> {

@@ -30,6 +30,7 @@ export default function LoginPage() {
     try {
       await loginAndRedirect(email, password, "/dashboard");
     } catch (error) {
+      console.error(error);
       setError("Email ou senha inválidos");
     } finally {
       setIsLoading(false);

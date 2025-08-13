@@ -3,29 +3,33 @@ import { persist } from "zustand/middleware";
 
 import { authService } from "@/services";
 import { AuthState, LoginCredentials, User } from "@/types";
+import { StorageManager } from "@/utils";
 
 interface AuthActions {
   login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setUser: (user: User | null) => void;
-  setToken: (token: string | null) => void;
+  setEmail: (email: string | null) => void;
   setIsLoading: (loading: boolean) => void;
-  initializeAuth: () => void;
-  refreshUserData: () => Promise<void>;
+  setIsInitialized: (initialized: boolean) => void;
+  initializeAuth: () => Promise<void>;
+  loadUserProfile: () => Promise<void>;
 }
 
 type AuthStore = AuthState & AuthActions;
 
+const initialState: AuthState = {
+  user: null,
+  email: null,
+  isLoading: true,
+  isInitialized: false,
+};
+
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      // Estado inicial
-      user: null,
-      token: null,
-      isLoading: true,
-      isAuthenticated: false,
+      ...initialState,
 
-      // Ações
       login: async (credentials: LoginCredentials) => {
         try {
           set({ isLoading: true });
@@ -34,84 +38,84 @@ export const useAuthStore = create<AuthStore>()(
 
           set({
             user: response.user,
-            token: response.token,
-            isAuthenticated: true,
+            email: credentials.email,
             isLoading: false,
           });
+
+          await new Promise((resolve) => setTimeout(resolve, 0));
         } catch (error) {
           set({ isLoading: false });
           throw error;
         }
       },
 
-      logout: () => {
+      logout: async () => {
+        StorageManager.remove("auth-email");
+        StorageManager.remove("auth-token");
+
         set({
           user: null,
-          token: null,
-          isAuthenticated: false,
+          email: null,
           isLoading: false,
+          isInitialized: true,
         });
-
-        // Limpar localStorage
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth-token");
-          localStorage.removeItem("auth-user");
-        }
       },
 
       setUser: (user: User | null) => {
-        set({
-          user,
-          isAuthenticated: !!user,
-        });
+        set({ user });
       },
 
-      setToken: (token: string | null) => {
-        set({ token });
+      setEmail: (email: string | null) => {
+        set({ email });
       },
 
       setIsLoading: (isLoading: boolean) => {
         set({ isLoading });
       },
 
-      initializeAuth: () => {
-        if (typeof window === "undefined") {
+      setIsInitialized: (isInitialized: boolean) => {
+        set({ isInitialized });
+      },
+
+      initializeAuth: async () => {
+        const currentState = get();
+
+        if (currentState.user && currentState.isInitialized) {
           set({ isLoading: false });
           return;
         }
 
-        const storedToken = localStorage.getItem("auth-token");
-        const storedUser = localStorage.getItem("auth-user");
+        set({ isLoading: true });
 
-        if (storedToken && storedUser) {
-          try {
-            const user = JSON.parse(storedUser);
-            set({
-              user,
-              token: storedToken,
-              isAuthenticated: true,
-              isLoading: false,
-            });
-          } catch {
-            // Se houver erro ao parsear, limpa os dados
-            localStorage.removeItem("auth-token");
-            localStorage.removeItem("auth-user");
-            set({ isLoading: false });
+        try {
+          const hasAuthInStorage = authService.hasAuth();
+          const storedEmail = authService.getStoredEmail();
+
+          if (hasAuthInStorage && storedEmail) {
+            if (!currentState.email || currentState.email !== storedEmail) {
+              set({ email: storedEmail });
+            }
+
+            await get().loadUserProfile();
+          } else {
+            authService.clearAuth();
+            set({ user: null, email: null });
           }
-        } else {
-          set({ isLoading: false });
+        } catch (error) {
+          console.error("Erro ao inicializar auth:", error);
+          authService.clearAuth();
+          set({ user: null, email: null });
+        } finally {
+          set({ isLoading: false, isInitialized: true });
         }
       },
 
-      refreshUserData: async () => {
-        const { token } = get();
-        if (!token) return;
-
+      loadUserProfile: async () => {
         try {
           const user = await authService.getProfile();
           set({ user });
         } catch (error) {
-          // Se falhar ao buscar dados do usuário, fazer logout
+          console.error("Erro ao carregar perfil:", error);
           get().logout();
         }
       },
@@ -119,10 +123,18 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "auth-store",
       partialize: (state) => ({
+        email: state.email,
         user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
+        // isInitialized e isLoading não são persistidos
       }),
+      // onRehydrateStorage: () => (state) => {
+      //   if (state) {
+      //     logger.debug("Zustand rehydrated with:", {
+      //       email: state.email,
+      //       hasUser: !!state.user,
+      //     });
+      //   }
+      // },
     },
   ),
 );

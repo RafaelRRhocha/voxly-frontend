@@ -41,6 +41,8 @@ const eslintConfig = [
       "@typescript-eslint": tsPlugin,
     },
     rules: {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/strict-boolean-expressions": "off",
       "@typescript-eslint/explicit-function-return-type": "off",

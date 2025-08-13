@@ -29,7 +29,7 @@ const initialState: DashboardState = {
   error: null,
 };
 
-export const useDashboardStore = create<DashboardStore>((set, get) => ({
+export const useDashboardStore = create<DashboardStore>((set) => ({
   ...initialState,
 
   fetchMetrics: async () => {
