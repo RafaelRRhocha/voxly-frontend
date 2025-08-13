@@ -45,7 +45,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <section className="sm:ml-14 p-4">
+    <section>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600">Visão geral das suas métricas</p>

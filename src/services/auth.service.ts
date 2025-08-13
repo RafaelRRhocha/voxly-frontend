@@ -4,7 +4,16 @@ import { api } from "./api";
 
 export class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    return api.postWithoutAuth<AuthResponse>("/auth/login", credentials);
+    // return api.postWithoutAuth<AuthResponse>("/auth/login", credentials);
+
+    return {
+      user: {
+        id: "1",
+        email: "teste@teste.com",
+        name: "Teste",
+      },
+      token: "123",
+    };
   }
 
   async register(

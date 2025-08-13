@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 
-import Header from "@/app/header";
 import Sidebar from "@/components/sidebar";
 
 import { ProtectedRoute } from "./auth/protected-route";
@@ -23,9 +22,13 @@ export default function ConditionalLayout({
 
   return (
     <ProtectedRoute>
-      <Sidebar />
-      <Header entityName="Voxly" />
-      <main className="flex-1 pt-20 p-6 overflow-y-auto">{children}</main>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar />
+
+        <main className="flex-1 overflow-y-auto bg-muted/10">
+          <div className="container p-6">{children}</div>
+        </main>
+      </div>
     </ProtectedRoute>
   );
 }

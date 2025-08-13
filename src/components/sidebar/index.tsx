@@ -1,20 +1,23 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
+  ChevronRight,
   Home,
-  Menu,
+  LogOut,
   Package,
   Settings2,
   ShoppingBag,
   Users2,
+  X,
 } from "lucide-react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { useAuth } from "@/hooks";
+import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/stores";
 
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
   Tooltip,
@@ -24,11 +27,16 @@ import {
 } from "../ui/tooltip";
 
 export default function Sidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logoutAndRedirect } = useAuth();
+  const { isOpen, isCollapsed, close, expand } = useSidebarStore();
+
   const navigationLinks = [
     {
       icon: Home,
-      label: "Início",
-      href: "/home",
+      label: "Dashboard",
+      href: "/dashboard",
     },
     {
       icon: ShoppingBag,
@@ -47,82 +55,159 @@ export default function Sidebar() {
     },
   ];
 
-  return (
-    <div className="flex w-full flex-col bg-muted/40">
-      {/* desktop */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-14 border-r bg-background sm:flex">
-        <nav className="flex flex-col items-center gap-4 px-2 py-5">
-          <TooltipProvider>
-            <Link
-              href="/"
-              className="flex size-10 bg-primary rounded-full text-lg items-center justify-center text-primary-foreground md:text-base gap-2"
-              prefetch={false}
-            >
-              <Package className="size-5 transition-all" />
-              <span className="sr-only">Logo do Projeto</span>
-            </Link>
+  const isLinkActive = (href: string) => pathname === href;
 
-            {navigationLinks.map((navigationLink) => (
-              <Tooltip key={navigationLink.label}>
+  const handleNavigation = (href: string) => {
+    router.push(href);
+    // if (isOpen) {
+    //   close();
+    // }
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+  const handleLogout = () => {
+    logoutAndRedirect("/login");
+  };
+
+  if (isCollapsed && !isOpen) {
+    return (
+      <TooltipProvider>
+        <aside className="inset-y-0 left-0 z-50 w-16 border-r bg-background flex flex-col">
+          <div className="p-4 border-b">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={expand}
+                  className="w-8 h-8"
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>Expandir sidebar</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <nav className="flex flex-col gap-2 p-4 flex-1">
+            {navigationLinks.map((link) => (
+              <Tooltip key={link.label}>
                 <TooltipTrigger asChild>
-                  <Link
-                    href={navigationLink.href}
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleNavigation(link.href)}
+                    className={cn(
+                      "w-8 h-8",
+                      isLinkActive(link.href)
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                    )}
                   >
-                    <navigationLink.icon className="size-5 transition-all" />
-                    <span className="sr-only">{navigationLink.label}</span>
-                  </Link>
+                    <link.icon className="size-4" />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  {navigationLink.label}
+                  <p>{link.label}</p>
                 </TooltipContent>
               </Tooltip>
             ))}
-          </TooltipProvider>
-        </nav>
-      </aside>
-
-      {/* mobile */}
-      <div className="sm:hidden flex flex-col sm:gap-4 sm:py-4 sm:pl-14 pt-20">
-        <div className="sticky top-0 z-30 flex h-14 items-center px-4 border-b bg-background gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="sm:hidden">
-                <Menu className="size-5" />
-                <span className="sr-only">Abrir ou fechar menu</span>
-              </Button>
-            </SheetTrigger>
-
-            <SheetContent side="left" className="sm:max-w-x" overlay={false}>
-              <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
-
-              <nav className="grid gap-6 text-lg font-medium p-2.5">
-                {/* <Link
-                  href="/"
-                  className="flex size-10 bg-primary rounded-full text-lg items-center justify-center text-primary-foreground md:text-base gap-2"
-                  prefetch={false}
+          </nav>
+          <div className="p-4 border-t">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                  className="w-8 h-8"
                 >
-                  <Package className="size-5 transition-all" />
-                  <span className="sr-only">Logo do Projeto</span>
-                </Link> */}
+                  <LogOut className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>Sair</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </aside>
+      </TooltipProvider>
+    );
+  }
 
-                {navigationLinks.map((navigationLink) => (
-                  <Link
-                    key={navigationLink.label}
-                    href={navigationLink.href}
-                    className="flex items-center gap-4 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
-                  >
-                    <navigationLink.icon className="size-5 transition-all" />
-                    <span>{navigationLink.label}</span>
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+  return (
+    <aside
+      className={cn(
+        "w-64 border-r bg-background flex flex-col transition-all duration-300 ease-in-out",
+        "md:relative md:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 transform",
+        isOpen ? "translate-x-0" : "-translate-x-full",
+      )}
+    >
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 bg-primary rounded-full items-center justify-center text-primary-foreground">
+              <Package className="size-4" />
+            </div>
+            <span className="font-semibold text-lg">Voxly</span>
+          </div>
+          <Button variant="ghost" size="icon" onClick={close}>
+            <X className="size-4" />
+          </Button>
+        </div>
+
+        <nav className="flex-1 flex flex-col gap-2 p-6">
+          {navigationLinks.map((link) => (
+            <Button
+              key={link.label}
+              variant="ghost"
+              onClick={() => handleNavigation(link.href)}
+              className={cn(
+                "justify-start gap-3 px-3 py-2 h-auto text-sm font-medium",
+                isLinkActive(link.href)
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+            >
+              <link.icon className="size-4" />
+              {link.label}
+            </Button>
+          ))}
+        </nav>
+
+        <div className="border-t p-6">
+          <div className="flex items-center gap-3 px-3 py-2 mb-4">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate">{user.name}</div>
+              <div className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </div>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="size-4" />
+            Sair
+          </Button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/router";
 import { AlertTriangle, Home, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  const router = useRouter();
+
   return (
     <html lang="pt-BR">
       <body className="bg-background">
@@ -40,7 +43,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <CardFooter className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => (window.location.href = "/")}
+                onClick={() => router.push("/")}
                 className="flex-1"
               >
                 <Home className="mr-2 size-4" />

@@ -4,3 +4,8 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs));
 }
+
+export function isMobile() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 768;
+}
