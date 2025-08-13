@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
   Home,
   LogOut,
-  Package,
   Store,
   Users,
   Vote,
@@ -98,6 +98,7 @@ export default function Sidebar() {
               </TooltipContent>
             </Tooltip>
           </div>
+
           <nav className="flex flex-col gap-2 p-4 flex-1">
             {navigationLinks.map((link) => (
               <Tooltip key={link.label}>
@@ -157,7 +158,12 @@ export default function Sidebar() {
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div className="flex items-center gap-2">
             <div className="flex size-8 bg-primary rounded-full items-center justify-center text-primary-foreground">
-              <Package className="size-4" />
+              <Image
+                src="/voxly_logo_branca.png"
+                alt="Voxly"
+                width={24}
+                height={24}
+              />
             </div>
             <span className="font-semibold text-lg">Voxly</span>
           </div>
