@@ -69,7 +69,7 @@ class ApiService {
     endpoint: string,
     params?: Record<string, string | number>,
   ): string {
-    const url = new URL(endpoint, this.baseURL);
+    const url = new URL(`/api${endpoint}`, this.baseURL);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

@@ -36,19 +36,11 @@ export class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // const response = await api.postWithoutAuth<AuthResponse>(
-    //   "/auth/login",
-    //   credentials,
-    // );
+    const response = await api.postWithoutAuth<AuthResponse>(
+      "/auth/login",
+      credentials,
+    );
 
-    const response = {
-      user: {
-        id: "1",
-        email: credentials.email,
-        name: "Teste",
-      },
-      token: "123",
-    };
     this.saveAuth(credentials.email, response.token);
     return response;
   }
@@ -65,13 +57,7 @@ export class AuthService {
   }
 
   async getProfile(): Promise<User> {
-    // return api.get<User>("/auth/profile");
-
-    return {
-      id: "1",
-      email: "teste@teste.com",
-      name: "Teste",
-    };
+    return api.get<User>("/auth/profile");
   }
 
   async refreshToken(email: string): Promise<AuthResponse> {
