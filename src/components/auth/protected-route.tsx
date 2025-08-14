@@ -26,7 +26,7 @@ export function ProtectedRoute({
   }, [user, isLoading, isInitialized]);
 
   if (isLoading || !isInitialized) {
-    return <Loading />;
+    return <Loading className="mt-5" />;
   }
 
   if (!user) {

@@ -1,11 +1,16 @@
+import { cn } from "@/lib/utils";
+
 interface LoadingProps {
   size?: number;
   label?: string;
+  className?: string;
 }
 
-const Loading = ({ size = 8, label }: LoadingProps) => {
+const Loading = ({ size = 8, label, className }: LoadingProps) => {
   return (
-    <div className="flex items-center justify-center size-full">
+    <div
+      className={cn("flex items-center justify-center size-full", className)}
+    >
       <div
         className="animate-spin rounded-full border-b-2 border-gray-900"
         style={{
