@@ -6,24 +6,28 @@ import {
   ChevronRight,
   Home,
   LogOut,
+  ShieldUser,
   Store,
   Users,
   Vote,
   X,
 } from "lucide-react";
 
+import { EUserRole } from "@/enums/user";
 import { useAuth } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/stores";
 
+import { TooltipSlot } from "../common/TooltipSlot";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+
+interface NavigationLink {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  hide?: boolean;
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -31,7 +35,7 @@ export default function Sidebar() {
   const { user, logoutAndRedirect } = useAuth();
   const { isOpen, isCollapsed, close, expand } = useSidebarStore();
 
-  const navigationLinks = [
+  const navigationLinks: Array<NavigationLink> = [
     {
       icon: Home,
       label: "Dashboard",
@@ -51,6 +55,12 @@ export default function Sidebar() {
       icon: Users,
       label: "Vendedores",
       href: "/sellers",
+    },
+    {
+      icon: ShieldUser,
+      label: "Usuários",
+      href: "/users",
+      hide: user?.role !== EUserRole.ADMIN,
     },
   ];
 
@@ -79,30 +89,31 @@ export default function Sidebar() {
 
   if (isCollapsed && !isOpen) {
     return (
-      <TooltipProvider>
-        <aside className="inset-y-0 left-0 z-50 w-16 border-r bg-background flex flex-col">
-          <div className="p-4 border-b">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={expand}
-                  className="w-8 h-8"
-                >
-                  <ChevronRight className="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Expandir sidebar</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
+      <aside className="inset-y-0 left-0 z-50 w-16 border-r bg-background flex flex-col">
+        <div className="p-4 border-b">
+          <TooltipSlot
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={expand}
+                className="w-8 h-8"
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+            }
+            content="Expandir sidebar"
+            side="right"
+          />
+        </div>
 
-          <nav className="flex flex-col gap-2 p-4 flex-1">
-            {navigationLinks.map((link) => (
-              <Tooltip key={link.label}>
-                <TooltipTrigger asChild>
+        <nav className="flex flex-col gap-2 p-4 flex-1">
+          {navigationLinks
+            .filter((link) => !link.hide)
+            .map((link) => (
+              <TooltipSlot
+                key={link.label}
+                trigger={
                   <Button
                     variant="ghost"
                     size="icon"
@@ -116,32 +127,29 @@ export default function Sidebar() {
                   >
                     <link.icon className="size-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>{link.label}</p>
-                </TooltipContent>
-              </Tooltip>
+                }
+                content={link.label}
+                side="right"
+              />
             ))}
-          </nav>
-          <div className="p-4 border-t">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleLogout}
-                  className="w-8 h-8"
-                >
-                  <LogOut className="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Sair</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </aside>
-      </TooltipProvider>
+        </nav>
+        <div className="p-4 border-t">
+          <TooltipSlot
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                className="w-8 h-8"
+              >
+                <LogOut className="size-4" />
+              </Button>
+            }
+            content="Sair"
+            side="right"
+          />
+        </div>
+      </aside>
     );
   }
 
@@ -173,22 +181,24 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex-1 flex flex-col gap-2 p-6">
-          {navigationLinks.map((link) => (
-            <Button
-              key={link.label}
-              variant="ghost"
-              onClick={() => handleNavigation(link.href)}
-              className={cn(
-                "justify-start gap-3 px-3 py-2 h-auto text-sm font-medium",
-                isLinkActive(link.href)
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
-              )}
-            >
-              <link.icon className="size-4" />
-              {link.label}
-            </Button>
-          ))}
+          {navigationLinks
+            .filter((link) => !link.hide)
+            .map((link) => (
+              <Button
+                key={link.label}
+                variant="ghost"
+                onClick={() => handleNavigation(link.href)}
+                className={cn(
+                  "justify-start gap-3 px-3 py-2 h-auto text-sm font-medium",
+                  isLinkActive(link.href)
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                )}
+              >
+                <link.icon className="size-4" />
+                {link.label}
+              </Button>
+            ))}
         </nav>
 
         <div className="border-t p-6">

@@ -3,6 +3,7 @@
 import { DollarSign, Package, ShoppingCart, Users2 } from "lucide-react";
 
 import ChartOverview from "@/components/chart";
+import PageTitle from "@/components/common/PageTitle";
 import {
   Card,
   CardContent,
@@ -46,10 +47,7 @@ export default function DashboardPage() {
 
   return (
     <section>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Visão geral das suas métricas</p>
-      </div>
+      <PageTitle title="Dashboard" subtitle="Visão geral das suas métricas" />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => (

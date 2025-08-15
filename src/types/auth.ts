@@ -1,7 +1,15 @@
+import { EUserRole } from "@/enums/user";
+
 export interface User {
-  id: string;
+  id: number;
   email: string;
   name: string;
+  entityId: number;
+  entityName: string;
+  role: EUserRole;
+  password_hash: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthResponse {
@@ -10,6 +18,7 @@ export interface AuthResponse {
 }
 
 export interface LoginCredentials {
+  name?: string;
   email: string;
   password: string;
 }

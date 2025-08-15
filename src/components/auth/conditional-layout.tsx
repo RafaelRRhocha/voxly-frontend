@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 import Sidebar from "@/components/sidebar";
 
-import { ProtectedRoute } from "./auth/protected-route";
+import { ProtectedRoute } from "./protected-route";
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;

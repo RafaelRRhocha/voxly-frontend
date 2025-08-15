@@ -35,6 +35,14 @@ export class AuthService {
     return StorageManager.hasAuth();
   }
 
+  async getProfile(): Promise<User> {
+    return api.get<User>("/auth/profile");
+  }
+
+  async putProfile(userData: LoginCredentials): Promise<User> {
+    return api.put<User>("/auth/profile", userData);
+  }
+
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await api.postWithoutAuth<AuthResponse>(
       "/auth/login",
@@ -43,21 +51,6 @@ export class AuthService {
 
     this.saveAuth(credentials.email, response.token);
     return response;
-  }
-
-  async register(
-    userData: LoginCredentials & { name: string },
-  ): Promise<AuthResponse> {
-    const response = await api.postWithoutAuth<AuthResponse>(
-      "/auth/register",
-      userData,
-    );
-    this.saveAuth(userData.email, response.token);
-    return response;
-  }
-
-  async getProfile(): Promise<User> {
-    return api.get<User>("/auth/profile");
   }
 
   async refreshToken(email: string): Promise<AuthResponse> {

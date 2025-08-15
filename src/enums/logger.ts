@@ -4,8 +4,8 @@ const blue = "\x1b[34m";
 const red = "\x1b[31m";
 
 export enum ELogger {
-  "DEBUG" = blue,
-  "INFO" = green,
-  "WARNING" = yellow,
-  "ERROR" = red,
+  DEBUG = blue,
+  INFO = green,
+  WARNING = yellow,
+  ERROR = red,
 }
