@@ -20,7 +20,10 @@ export class UsersService {
   }
 
   async createUser(user: User): Promise<User> {
-    return api.post<User>("/users/register", user);
+    return api.post<User>("/users/register", {
+      ...user,
+      entity_id: user.entityId,
+    });
   }
 }
 

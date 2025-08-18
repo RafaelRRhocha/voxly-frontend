@@ -19,6 +19,8 @@ interface DialogSlotProps {
   showConfirmButton?: boolean;
   confirmButtonText?: string;
   cancelButtonText?: string;
+  confirmButtonDisabled?: boolean;
+  cancelButtonDisabled?: boolean;
   onConfirm?: () => void;
   onCancel?: () => void;
   asChild?: boolean;
@@ -33,6 +35,8 @@ export function DialogSlot({
   showConfirmButton = true,
   confirmButtonText = "Confirmar",
   cancelButtonText = "Cancelar",
+  confirmButtonDisabled = false,
+  cancelButtonDisabled = false,
   onConfirm,
   onCancel,
   asChild = true,
@@ -52,14 +56,23 @@ export function DialogSlot({
           <DialogFooter className="gap-2">
             {showCancelButton && (
               <DialogClose asChild>
-                <Button type="button" variant="outline" onClick={onCancel}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                  disabled={cancelButtonDisabled}
+                >
                   {cancelButtonText}
                 </Button>
               </DialogClose>
             )}
             {showConfirmButton && (
               <DialogClose asChild>
-                <Button type="submit" onClick={onConfirm}>
+                <Button
+                  type="submit"
+                  onClick={onConfirm}
+                  disabled={confirmButtonDisabled}
+                >
                   {confirmButtonText}
                 </Button>
               </DialogClose>

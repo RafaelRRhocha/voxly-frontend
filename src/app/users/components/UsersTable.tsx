@@ -22,8 +22,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUsers } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 import { User } from "@/types";
+
+import { DeleteUserDialog } from "./DeleteUserDialog";
+import { EditUserDialog } from "./EditUserDialog";
 
 interface UsersTableProps {
   users: Array<User>;
@@ -128,6 +132,8 @@ const UserDetailsCard = ({ user }: { user: User }) => {
 };
 
 export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
+  const { updateUser, deleteUser } = useUsers();
+
   if (isLoading) {
     return <TableLoading />;
   }
@@ -179,20 +185,34 @@ export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
 
                 <TooltipSlot
                   trigger={
-                    <Button variant="outline" size="icon">
-                      <PencilIcon className="h-4 w-4" />
-                    </Button>
+                    <EditUserDialog
+                      user={user}
+                      onUpdate={updateUser}
+                      trigger={
+                        <Button variant="outline" size="icon">
+                          <PencilIcon className="h-4 w-4" />
+                        </Button>
+                      }
+                    />
                   }
                   content="Editar"
+                  asChild={true}
                 />
 
                 <TooltipSlot
                   trigger={
-                    <Button variant="outline" size="icon">
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
+                    <DeleteUserDialog
+                      user={user}
+                      onDelete={deleteUser}
+                      trigger={
+                        <Button variant="outline" size="icon">
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
+                      }
+                    />
                   }
                   content="Excluir"
+                  asChild={true}
                 />
               </TableCell>
             </TableRow>

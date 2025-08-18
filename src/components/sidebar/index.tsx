@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -19,8 +20,9 @@ import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/stores";
 
 import { TooltipSlot } from "../common/TooltipSlot";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
+
+import { UserAvatarEdit } from "./UserAvatarEdit";
 
 interface NavigationLink {
   icon: React.ElementType;
@@ -35,34 +37,37 @@ export default function Sidebar() {
   const { user, logoutAndRedirect } = useAuth();
   const { isOpen, isCollapsed, close, expand } = useSidebarStore();
 
-  const navigationLinks: Array<NavigationLink> = [
-    {
-      icon: Home,
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      icon: Vote,
-      label: "Enquetes",
-      href: "/surveys",
-    },
-    {
-      icon: Store,
-      label: "Lojas",
-      href: "/stores",
-    },
-    {
-      icon: Users,
-      label: "Vendedores",
-      href: "/sellers",
-    },
-    {
-      icon: ShieldUser,
-      label: "Usuários",
-      href: "/users",
-      hide: user?.role !== EUserRole.ADMIN,
-    },
-  ];
+  const navigationLinks: Array<NavigationLink> = useMemo(
+    () => [
+      {
+        icon: Home,
+        label: "Dashboard",
+        href: "/dashboard",
+      },
+      {
+        icon: Vote,
+        label: "Enquetes",
+        href: "/surveys",
+      },
+      {
+        icon: Store,
+        label: "Lojas",
+        href: "/stores",
+      },
+      {
+        icon: Users,
+        label: "Vendedores",
+        href: "/sellers",
+      },
+      {
+        icon: ShieldUser,
+        label: "Usuários",
+        href: "/users",
+        hide: user?.role !== EUserRole.ADMIN,
+      },
+    ],
+    [user?.role],
+  );
 
   const isLinkActive = (href: string) => pathname === href;
 
@@ -76,12 +81,6 @@ export default function Sidebar() {
   if (!user) {
     return null;
   }
-
-  const initials = user.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
 
   const handleLogout = async () => {
     await logoutAndRedirect("/login");
@@ -202,17 +201,7 @@ export default function Sidebar() {
         </nav>
 
         <div className="border-t p-6">
-          <div className="flex items-center gap-3 px-3 py-2 mb-4">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium truncate">{user.name}</div>
-              <div className="text-xs text-muted-foreground truncate">
-                {user.email}
-              </div>
-            </div>
-          </div>
+          <UserAvatarEdit />
           <Button
             variant="ghost"
             onClick={handleLogout}

@@ -8,6 +8,7 @@ import { StorageManager } from "@/utils";
 interface AuthActions {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (userData: Partial<User>) => Promise<void>;
   setUser: (user: User | null) => void;
   setEmail: (email: string | null) => void;
   setIsLoading: (loading: boolean) => void;
@@ -40,9 +41,8 @@ export const useAuthStore = create<AuthStore>()(
             user: response.user,
             email: credentials.email,
             isLoading: false,
+            isInitialized: true,
           });
-
-          await new Promise((resolve) => setTimeout(resolve, 0));
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -107,6 +107,16 @@ export const useAuthStore = create<AuthStore>()(
           set({ user: null, email: null });
         } finally {
           set({ isLoading: false, isInitialized: true });
+        }
+      },
+
+      updateProfile: async (userData: Partial<User>) => {
+        try {
+          const updatedUser = await authService.putProfile(userData);
+          set({ user: updatedUser });
+        } catch (error) {
+          console.error("Erro ao atualizar perfil:", error);
+          throw error;
         }
       },
 

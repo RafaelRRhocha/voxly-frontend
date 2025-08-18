@@ -39,7 +39,7 @@ export class AuthService {
     return api.get<User>("/auth/profile");
   }
 
-  async putProfile(userData: LoginCredentials): Promise<User> {
+  async putProfile(userData: Partial<User>): Promise<User> {
     return api.put<User>("/auth/profile", userData);
   }
 
