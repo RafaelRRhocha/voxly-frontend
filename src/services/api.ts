@@ -43,9 +43,14 @@ class ApiService {
           throw new Error("No email found");
         }
 
+        const currentToken = this.getAuthToken();
+
         const response = await this.postWithoutAuth<{ token: string }>(
           "/auth/refresh",
-          { email },
+          {
+            email,
+            token: currentToken,
+          },
           { skipRefresh: true },
         );
 
@@ -63,6 +68,30 @@ class ApiService {
     });
 
     return this.refreshPromise;
+  }
+
+  private async executeWithRetry<T>(
+    makeRequest: () => Promise<T>,
+    skipRefresh?: boolean,
+  ): Promise<T> {
+    try {
+      return await makeRequest();
+    } catch (error: any) {
+      if (error.shouldRetry && !skipRefresh) {
+        if (!this.isRefreshing) {
+          this.isRefreshing = true;
+          this.refreshPromise = this.refreshToken();
+        }
+
+        try {
+          await this.refreshPromise;
+          return makeRequest();
+        } catch (refreshError) {
+          throw refreshError;
+        }
+      }
+      throw error;
+    }
   }
 
   private buildURL(
@@ -95,17 +124,14 @@ class ApiService {
         error.message = errorData.message || error.message;
         error.code = errorData.code;
       } catch {
-        // Se não conseguir parsear o JSON, mantém a mensagem padrão
+        // Mantém a mensagem padrão se não conseguir parsear JSON
       }
 
-      if (response.status === 401 && !config.skipRefresh) {
-        try {
-          await this.refreshToken();
-          throw { ...error, shouldRetry: true };
-        } catch (refreshError) {
-          console.error(refreshError);
-          throw error;
-        }
+      if (
+        (response.status === 401 || response.status === 403) &&
+        !config.skipRefresh
+      ) {
+        throw { ...error, shouldRetry: true };
       }
 
       throw error;
@@ -134,25 +160,16 @@ class ApiService {
   async get<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
     const { params, skipRefresh, ...requestConfig } = config;
 
-    const makeRequest = async (): Promise<T> => {
+    const makeRequest = () => {
       const url = this.buildURL(endpoint, params);
-      const response = await fetch(url, {
+      return fetch(url, {
         method: "GET",
         headers: this.getHeaders(),
         ...requestConfig,
-      });
-
-      return this.handleResponse<T>(response, config);
+      }).then((response) => this.handleResponse<T>(response, config));
     };
 
-    try {
-      return await makeRequest();
-    } catch (error: any) {
-      if (error.shouldRetry && !skipRefresh) {
-        return makeRequest();
-      }
-      throw error;
-    }
+    return this.executeWithRetry(makeRequest, skipRefresh);
   }
 
   async post<T>(
@@ -162,26 +179,17 @@ class ApiService {
   ): Promise<T> {
     const { params, skipRefresh, ...requestConfig } = config;
 
-    const makeRequest = async (): Promise<T> => {
+    const makeRequest = () => {
       const url = this.buildURL(endpoint, params);
-      const response = await fetch(url, {
+      return fetch(url, {
         method: "POST",
         headers: this.getHeaders(),
         body: data ? JSON.stringify(data) : undefined,
         ...requestConfig,
-      });
-
-      return this.handleResponse<T>(response, config);
+      }).then((response) => this.handleResponse<T>(response, config));
     };
 
-    try {
-      return await makeRequest();
-    } catch (error: any) {
-      if (error.shouldRetry && !skipRefresh) {
-        return makeRequest();
-      }
-      throw error;
-    }
+    return this.executeWithRetry(makeRequest, skipRefresh);
   }
 
   async put<T>(
@@ -191,50 +199,32 @@ class ApiService {
   ): Promise<T> {
     const { params, skipRefresh, ...requestConfig } = config;
 
-    const makeRequest = async (): Promise<T> => {
+    const makeRequest = () => {
       const url = this.buildURL(endpoint, params);
-      const response = await fetch(url, {
+      return fetch(url, {
         method: "PUT",
         headers: this.getHeaders(),
         body: data ? JSON.stringify(data) : undefined,
         ...requestConfig,
-      });
-
-      return this.handleResponse<T>(response, config);
+      }).then((response) => this.handleResponse<T>(response, config));
     };
 
-    try {
-      return await makeRequest();
-    } catch (error: any) {
-      if (error.shouldRetry && !skipRefresh) {
-        return makeRequest();
-      }
-      throw error;
-    }
+    return this.executeWithRetry(makeRequest, skipRefresh);
   }
 
   async delete<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
     const { params, skipRefresh, ...requestConfig } = config;
 
-    const makeRequest = async (): Promise<T> => {
+    const makeRequest = () => {
       const url = this.buildURL(endpoint, params);
-      const response = await fetch(url, {
+      return fetch(url, {
         method: "DELETE",
         headers: this.getHeaders(),
         ...requestConfig,
-      });
-
-      return this.handleResponse<T>(response, config);
+      }).then((response) => this.handleResponse<T>(response, config));
     };
 
-    try {
-      return await makeRequest();
-    } catch (error: any) {
-      if (error.shouldRetry && !skipRefresh) {
-        return makeRequest();
-      }
-      throw error;
-    }
+    return this.executeWithRetry(makeRequest, skipRefresh);
   }
 
   async postWithoutAuth<T>(

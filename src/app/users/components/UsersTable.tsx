@@ -22,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useUsers } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 import { User } from "@/types";
 
@@ -32,6 +31,8 @@ import { EditUserDialog } from "./EditUserDialog";
 interface UsersTableProps {
   users: Array<User>;
   isLoading?: boolean;
+  onUpdateUser: (userId: number, userData: Partial<User>) => Promise<void>;
+  onDeleteUser: (userId: number) => Promise<void>;
 }
 
 const UserDetailsCard = ({ user }: { user: User }) => {
@@ -131,9 +132,12 @@ const UserDetailsCard = ({ user }: { user: User }) => {
   );
 };
 
-export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
-  const { updateUser, deleteUser } = useUsers();
-
+export const UsersTable = ({
+  users,
+  isLoading,
+  onUpdateUser,
+  onDeleteUser,
+}: UsersTableProps) => {
   if (isLoading) {
     return <TableLoading />;
   }
@@ -180,14 +184,14 @@ export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
                     </DialogSlot>
                   }
                   content="Ver Detalhes"
-                  asChild={true}
+                  // asChild={false}
                 />
 
                 <TooltipSlot
                   trigger={
                     <EditUserDialog
                       user={user}
-                      onUpdate={updateUser}
+                      onUpdate={onUpdateUser}
                       trigger={
                         <Button variant="outline" size="icon">
                           <PencilIcon className="h-4 w-4" />
@@ -196,14 +200,13 @@ export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
                     />
                   }
                   content="Editar"
-                  asChild={true}
                 />
 
                 <TooltipSlot
                   trigger={
                     <DeleteUserDialog
                       user={user}
-                      onDelete={deleteUser}
+                      onDelete={onDeleteUser}
                       trigger={
                         <Button variant="outline" size="icon">
                           <TrashIcon className="h-4 w-4" />
@@ -212,7 +215,6 @@ export const UsersTable = ({ users, isLoading }: UsersTableProps) => {
                     />
                   }
                   content="Excluir"
-                  asChild={true}
                 />
               </TableCell>
             </TableRow>

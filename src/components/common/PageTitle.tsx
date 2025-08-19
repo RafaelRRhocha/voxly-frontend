@@ -64,7 +64,7 @@ const PageTitle: React.FC<PageTitleProps> = ({
 
           {subtitle && (
             <span
-              className={cn("text-sm text-gray-500", {
+              className={cn("hidden md:block text-sm text-gray-500", {
                 "ml-11": canBack,
               })}
             >

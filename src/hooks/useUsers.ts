@@ -19,7 +19,7 @@ export const useUsers = () => {
       console.error("Entidade não encontrada para o usuário", user);
       handleLogout();
     }
-  }, []);
+  }, [user?.entityId]);
 
   return {
     ...usersStore,
