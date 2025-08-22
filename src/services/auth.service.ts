@@ -61,13 +61,15 @@ export class AuthService {
     return response;
   }
 
-  async forgotPassword(email: string): Promise<void> {
-    return api.postWithoutAuth<void>("/auth/forgot-password", { email });
+  async requestPasswordReset(email: string): Promise<void> {
+    return api.postWithoutAuth<void>("/auth/forgot-password", {
+      email,
+    });
   }
 
-  async resetPassword(token: string, password: string): Promise<void> {
+  async resetPassword(email: string, password: string): Promise<void> {
     return api.postWithoutAuth<void>("/auth/reset-password", {
-      token,
+      email,
       password,
     });
   }
